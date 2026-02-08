@@ -13,7 +13,8 @@ Deploy Terraform Cloud agents using AWS CodeBuild or ECS Fargate.
 
 ```hcl
 module "tfc_agent" {
-  source = "./modules/terraform-tfc-agent"
+  source  = "King-Zingelwayo/tfc-agent/aws"
+  version = "1.0.1"
 
   agent_type      = "codebuild"
   environment     = "dev"
@@ -31,7 +32,8 @@ module "tfc_agent" {
 
 ```hcl
 module "tfc_agent" {
-  source = "./modules/terraform-tfc-agent"
+  source  = "King-Zingelwayo/tfc-agent/aws"
+  version = "1.0.1"
 
   agent_type      = "codebuild"
   environment     = "dev"
@@ -49,7 +51,8 @@ module "tfc_agent" {
 
 ```hcl
 module "tfc_agent" {
-  source = "./modules/terraform-tfc-agent"
+  source  = "King-Zingelwayo/tfc-agent/aws"
+  version = "1.0.1"
 
   agent_type      = "ecs"
   environment     = "prod"

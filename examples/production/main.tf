@@ -1,5 +1,6 @@
 module "tfc_agent" {
-  source = "../../terraform-modules/tfc-agent-codebuild"
+  source  = "King-Zingelwayo/tfc-agent/aws"
+  version = "1.0.1"
 
   environment     = "prod"
   tfc_agent_token = var.tfc_agent_token
