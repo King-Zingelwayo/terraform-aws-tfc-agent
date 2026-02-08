@@ -27,6 +27,24 @@ module "tfc_agent" {
 }
 ```
 
+### CodeBuild Agent with VPC
+
+```hcl
+module "tfc_agent" {
+  source = "./modules/terraform-tfc-agent"
+
+  agent_type      = "codebuild"
+  environment     = "dev"
+  tfc_agent_token = var.tfc_agent_token
+  
+  vpc_config = {
+    vpc_id             = "vpc-12345678"
+    subnets            = ["subnet-abc123", "subnet-def456"]
+    security_group_ids = ["sg-12345678"]
+  }
+}
+```
+
 ### ECS Fargate Agent
 
 ```hcl
@@ -38,16 +56,14 @@ module "tfc_agent" {
   tfc_agent_token = var.tfc_agent_token
   agent_pool_size = 2
   
-  # Required for ECS
-  ecs_vpc_id          = "vpc-12345678"
-  ecs_subnet_ids      = ["subnet-abc123", "subnet-def456"]
-  ecs_assign_public_ip = true
-  ecs_cpu             = 512
-  ecs_memory          = 1024
+  ecs_cpu    = 1024
+  ecs_memory = 2048
   
-  # Disable CodeBuild triggers
-  enable_scheduled_trigger = false
-  enable_lambda_trigger    = false
+  vpc_config = {
+    vpc_id             = "vpc-12345678"
+    subnets            = ["subnet-abc123", "subnet-def456"]
+    security_group_ids = ["sg-12345678"]
+  }
 }
 ```
 
@@ -57,10 +73,35 @@ module "tfc_agent" {
 - `environment`: dev/staging/prod
 - `tfc_agent_token`: Terraform Cloud agent token
 
-## ECS Required Variables
+## VPC Configuration
 
-- `ecs_vpc_id`: VPC ID
-- `ecs_subnet_ids`: List of subnet IDs (must have internet access)
+### CodeBuild (Optional)
+VPC configuration is **optional** for CodeBuild. Only specify if you need agents to run within your private network to access internal resources.
+
+**Without VPC** (default): Agents run in AWS-managed network with internet access.
+
+**With VPC**: Agents run in your private subnets. Ensure subnets have:
+- NAT Gateway for internet access (to reach Terraform Cloud)
+- Or VPC endpoints for AWS services
+
+### ECS (Required)
+VPC configuration is **required** for ECS Fargate. You must specify:
+- `vpc_id`: Your VPC ID
+- `subnets`: Private or public subnet IDs
+- `security_group_ids`: Security groups allowing outbound HTTPS (443) to Terraform Cloud
+
+**Public subnets**: Set `ecs_assign_public_ip = true` (default)
+**Private subnets**: Requires NAT Gateway or VPC endpoints for internet access
+
+### Configuration Object
+
+```hcl
+vpc_config = {
+  vpc_id             = "vpc-12345678"
+  subnets            = ["subnet-abc123", "subnet-def456"]
+  security_group_ids = ["sg-12345678"]
+}
+```
 
 ## Key Variables
 
